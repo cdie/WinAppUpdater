@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2036
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A3AD64AB-6CB0-4C17-9F2B-9FEFC225F825}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A5AE8F28-1FDB-47B5-9686-0B0842B32604}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinAppUpdater", "src\WinAppUpdater\WinAppUpdater.csproj", "{F9B8C137-9850-4DC9-BE5F-00975E68E5DF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F9B8C137-9850-4DC9-BE5F-00975E68E5DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9B8C137-9850-4DC9-BE5F-00975E68E5DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9B8C137-9850-4DC9-BE5F-00975E68E5DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9B8C137-9850-4DC9-BE5F-00975E68E5DF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F9B8C137-9850-4DC9-BE5F-00975E68E5DF} = {A3AD64AB-6CB0-4C17-9F2B-9FEFC225F825}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {71E1AAC0-C944-4C5D-9DAD-AE88D6492890}
+	EndGlobalSection
+EndGlobal
