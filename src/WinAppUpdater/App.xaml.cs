@@ -6,8 +6,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using WinAppUpdater.Core;
 using WinAppUpdater.Models;
 using WinAppUpdater.Views;
+//using Microsoft.
 
 namespace WinAppUpdater
 {
@@ -23,6 +25,18 @@ namespace WinAppUpdater
         private const string CONST_ALIAS_APP_NAME = "appName";
         private const string CONST_ALIAS_LAUNCH_PROCESS_ID = "pid";
         private const string CONST_ALIAS_VERSION_FILEPATH = "versionFilePath";
+        private const string CONST_ALIAS_SILENT_MODE = "silentMode";
+
+        #endregion
+
+        #region Members
+
+        private bool _silentMode;
+
+        #endregion
+
+        #region Properties
+        
 
         #endregion
 
@@ -30,6 +44,8 @@ namespace WinAppUpdater
 
         public App()
         {
+            
+
             var commandLines = Environment.GetCommandLineArgs();
             if (commandLines.Length <= 1)
             {
@@ -48,9 +64,9 @@ namespace WinAppUpdater
 
         #region Private methods
 
-        private LaunchParams ParseCommandLineArgs(string[] commandLines)
+        private CommandLine ParseCommandLineArgs(string[] commandLines)
         {
-            var launchParams = new LaunchParams();
+            var launchParams = new CommandLine();
             foreach (var item in commandLines)
             {
                 try
@@ -59,20 +75,20 @@ namespace WinAppUpdater
                     var commandData = item.Substring(item.IndexOf(':') + 1);
                     switch (alias)
                     {
-                        case CONST_ALIAS_URL:
-                            launchParams.URL = commandData;
-                            break;
-                        case CONST_ALIAS_URLTYPE:
-                            launchParams.URLType = (URLType)Enum.Parse(typeof(URLType), commandData);
-                            break;
-                        case CONST_ALIAS_APP_NAME:
-                            launchParams.AppName = commandData;
-                            break;
-                        case CONST_ALIAS_APP_VERSION:
-                            launchParams.AppVersion = commandData;
-                            break;
+                        //case CONST_ALIAS_URL:
+                        //    launchParams.URL = commandData;
+                        //    break;
+                        //case CONST_ALIAS_URLTYPE:
+                        //    launchParams.URLType = (URLType)System.Enum.Parse(typeof(URLType), commandData);
+                        //    break;
+                        //case CONST_ALIAS_APP_NAME:
+                        //    launchParams.AppName = commandData;
+                        //    break;
+                        //case CONST_ALIAS_APP_VERSION:
+                        //    launchParams.AppVersion = commandData;
+                            //break;
                         case CONST_ALIAS_MODE:
-                            launchParams.Mode = (LaunchMode)Enum.Parse(typeof(LaunchMode), commandData);
+                            launchParams.Mode = (LaunchMode)System.Enum.Parse(typeof(LaunchMode), commandData);
                             break;
                         case CONST_ALIAS_LAUNCH_PROCESS_ID:
                             launchParams.PID = int.Parse(commandData);
@@ -80,64 +96,71 @@ namespace WinAppUpdater
                         case CONST_ALIAS_VERSION_FILEPATH:
                             launchParams.VersionFilePath = commandData;
                             break;
+                        case CONST_ALIAS_SILENT_MODE:
+                            _silentMode = commandData == "1";
+                            break;
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    MessageBox.Show($"Impossible de traiter l'argument {item}");
+                    if (!_silentMode)
+                    {
+                        MessageBox.Show($"Command-line arg {item} could not be parsed.");
+                    }
+
                 }
             }
             return launchParams;
         }
 
-        private void ActAsParams(LaunchParams @params)
+        private void ActAsParams(CommandLine @params)
         {
             if (@params.Mode == LaunchMode.Check)
             {
-                if (!string.IsNullOrWhiteSpace(@params.URL))
-                {
-                    if (@params.URLType == URLType.Local)
-                    {
-                        if (!File.Exists(@params.URL))
-                        {
-                            MessageBox.Show($"L'URL {@params.URL} vers le fichier des infos de MAJ n'existe pas.");
-                            Environment.Exit(2);
-                        }
-                        try
-                        {
-                            var fileData = JsonConvert.DeserializeObject<IEnumerable<AppVersions>>(File.ReadAllText(@params.URL));
-                            var appData = fileData.FirstOrDefault(a => a.AppName == @params.AppName);
-                            if (appData != null)
-                            {
-                                var lastVersion = appData.Versions.OrderByDescending(d => d.Version).FirstOrDefault();
-                                if (lastVersion != null)
-                                {
-                                    if (string.Compare(lastVersion.Version, @params.AppVersion, true) > 0)
-                                    {
-                                        var processInfo = Process.GetProcessById(@params.PID);
-                                        var newVersion = new NewVersionView(@params.AppName, @params.AppVersion, processInfo,
-                                            @params.VersionFilePath, lastVersion);
-                                        Application.Current.MainWindow = newVersion;
-                                        newVersion.Show();
-                                    }
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            MessageBox.Show($"Erreur lors du traitement. {Environment.NewLine}{e}");
-                        }
+                //if (!string.IsNullOrWhiteSpace(@params.URL))
+                //{
+                //    if (@params.URLType == URLType.Local)
+                //    {
+                //        if (!File.Exists(@params.URL))
+                //        {
+                //            MessageBox.Show($"L'URL {@params.URL} vers le fichier des infos de MAJ n'existe pas.");
+                //            Environment.Exit(2);
+                //        }
+                //        try
+                //        {
+                //            var fileData = JsonConvert.DeserializeObject<IEnumerable<AppVersions>>(File.ReadAllText(@params.URL));
+                //            var appData = fileData.FirstOrDefault(a => a.AppName == @params.AppName);
+                //            if (appData != null)
+                //            {
+                //                var lastVersion = appData.Versions.OrderByDescending(d => d.Version).FirstOrDefault();
+                //                if (lastVersion != null)
+                //                {
+                //                    if (string.Compare(lastVersion.Version, @params.AppVersion, true) > 0)
+                //                    {
+                //                        var processInfo = Process.GetProcessById(@params.PID);
+                //                        var newVersion = new NewVersionView(@params.AppName, @params.AppVersion, processInfo,
+                //                            @params.VersionFilePath, lastVersion);
+                //                        Application.Current.MainWindow = newVersion;
+                //                        newVersion.Show();
+                //                    }
+                //                }
+                //            }
+                //        }
+                //        catch (Exception e)
+                //        {
+                //            MessageBox.Show($"Erreur lors du traitement. {Environment.NewLine}{e}");
+                //        }
 
-                    }
-                    else
-                    {
+                //    }
+                //    else
+                //    {
 
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("L'URL de récupération des infos de mise à jour n'a pas été fournie.");
-                }
+                //    }
+                //}
+                //else
+                //{
+                //    MessageBox.Show("L'URL de récupération des infos de mise à jour n'a pas été fournie.");
+                //}
             }
             else if (@params.Mode == LaunchMode.Edition)
             {

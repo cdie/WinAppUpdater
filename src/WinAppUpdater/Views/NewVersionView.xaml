@@ -1,10 +1,11 @@
-﻿<ctrl:MetroWindow
+﻿<mahapps:CQEMetroWindow
     x:Class="WinAppUpdater.Views.NewVersionView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ctrl="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:WinAppUpdater"
+    xmlns:mahapps="clr-namespace:CQELight.MVVM.MahApps;assembly=CQELight.MVVM.MahApps"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="Nouvelle version!"
     Width="500"
@@ -89,4 +90,4 @@
             </TextBlock.Style>
         </TextBlock>
     </Grid>
-</ctrl:MetroWindow>
+</mahapps:CQEMetroWindow>

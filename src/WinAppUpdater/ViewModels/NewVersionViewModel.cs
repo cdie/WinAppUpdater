@@ -1,30 +1,21 @@
-﻿using MahApps.Metro.Controls;
-using MahApps.Metro.Controls.Dialogs;
-using Prism.Commands;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using WinAppUpdater.Models;
+using CQELight.MVVM;
+using CQELight.MVVM.Interfaces;
 
 namespace WinAppUpdater.ViewModels
 {
-    class NewVersionViewModel : INotifyPropertyChanged
+    class NewVersionViewModel : BaseViewModel
     {
 
         #region Members
 
-        private readonly UpdateVersion _version;
         private readonly Process _appProcess;
         private readonly string _versionFilePath;
-        private readonly MetroWindow _holderWindow;
-        public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
 
@@ -59,7 +50,6 @@ namespace WinAppUpdater.ViewModels
         }
         private string _changelog;
 
-
         public bool Installing
         {
             get => _installing;
@@ -82,43 +72,44 @@ namespace WinAppUpdater.ViewModels
 
         #region Ctor
 
-        public NewVersionViewModel(MetroWindow window, string appName, string appVersion, Process appProcess, string versionFilePath, UpdateVersion version)
+        public NewVersionViewModel(IView window, string appName, string appVersion,
+            Process appProcess, string versionFilePath)
+            : base(window)
         {
             AppVersion = appVersion;
             AppName = appName;
-            _version = version;
+            //_version = version;
 
             InstallNewVersionCommand = new DelegateCommand(InstallNewVersion);
-            CancelCommand = new DelegateCommand(window.Close);
+            CancelCommand = new DelegateCommand(_ => window.Close());
 
             _appProcess = appProcess;
             _versionFilePath = versionFilePath;
-            window.Loaded += (s, e) =>
-            {
-                NewVersion = _version.Version;
-                if (!_version.Changelog.Contains("<html>"))
-                {
-                    Changelog = $"<html><body><span>{_version.Changelog}</span></body></html>";
-                }
-                else
-                {
-                    Changelog = _version.Changelog;
-                }
-            };
-            _holderWindow = window;
+            //_view.Loaded += (s, e) =>
+            //{
+            //    //NewVersion = _version.Version;
+            //    //if (!_version.Changelog.Contains("<html>"))
+            //    //{
+            //    //    Changelog = $"<html><body><span>{_version.Changelog}</span></body></html>";
+            //    //}
+            //    //else
+            //    //{
+            //    //    Changelog = _version.Changelog;
+            //    //}
+            //};
         }
 
         #endregion
 
         #region Public methods
 
-        public async void InstallNewVersion()
+        public async void InstallNewVersion(object p = null)
         {
-            if (!File.Exists(_version.PathToUpdateZip))
-            {
-                MessageBox.Show($"The file {_version.PathToUpdateZip} which contains update data was not found.", "Error", 
-                    MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            //if (!File.Exists(_version.PathToUpdateZip))
+            //{
+            //    MessageBox.Show($"The file {_version.PathToUpdateZip} which contains update data was not found.", "Error", 
+            //        MessageBoxButton.OK, MessageBoxImage.Error);
+            //}
             string directory = Path.GetDirectoryName(_appProcess.MainModule.FileName);
             string exePath = _appProcess.MainModule.FileName;
             try
@@ -137,27 +128,27 @@ namespace WinAppUpdater.ViewModels
             {
                 await Task.Run(() =>
                 {
-                    using (ZipArchive archive = ZipFile.OpenRead(_version.PathToUpdateZip))
-                    {
-                        var fullExtractPath = string.Empty;
-                        int i = 1;
-                        int total = archive.Entries.Count;
-                        foreach (var entry in archive.Entries)
-                        {
-                            fullExtractPath = Path.Combine(directory, entry.FullName);
-                            if (String.IsNullOrEmpty(entry.Name))
-                            {
-                                CurrentFile = $"Extracting directory {fullExtractPath} ({i}/{total})";
-                                Directory.CreateDirectory(fullExtractPath);   
-                            }
-                            else
-                            {
-                                CurrentFile = $"Extracting file {entry.Name}  ({i}/{total})";
-                                entry.ExtractToFile(fullExtractPath, true);
-                            }
-                            i++;
-                        }
-                    }
+                    //using (ZipArchive archive = ZipFile.OpenRead(_version.PathToUpdateZip))
+                    //{
+                    //    var fullExtractPath = string.Empty;
+                    //    int i = 1;
+                    //    int total = archive.Entries.Count;
+                    //    foreach (var entry in archive.Entries)
+                    //    {
+                    //        fullExtractPath = Path.Combine(directory, entry.FullName);
+                    //        if (String.IsNullOrEmpty(entry.Name))
+                    //        {
+                    //            CurrentFile = $"Extracting directory {fullExtractPath} ({i}/{total})";
+                    //            Directory.CreateDirectory(fullExtractPath);   
+                    //        }
+                    //        else
+                    //        {
+                    //            CurrentFile = $"Extracting file {entry.Name}  ({i}/{total})";
+                    //            entry.ExtractToFile(fullExtractPath, true);
+                    //        }
+                    //        i++;
+                    //    }
+                    //}
                 });
             }
             catch (Exception e)
@@ -166,7 +157,7 @@ namespace WinAppUpdater.ViewModels
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            File.WriteAllText(_versionFilePath, _version.Version);
+            //File.WriteAllText(_versionFilePath, _version.Version);
             MessageBox.Show($"The app '{AppName}' has been updated ! It will restart now.", "Update complete !",
                     MessageBoxButton.OK, MessageBoxImage.Information);
             Process.Start(exePath);
@@ -174,26 +165,6 @@ namespace WinAppUpdater.ViewModels
         }
 
         #endregion
-
-        #region Private methods
-
-        private bool Set<T>(ref T member, T value, [CallerMemberName] string memberName = "")
-        {
-            if (EqualityComparer<T>.Default.Equals(member, value))
-                return false;
-
-            member = value;
-            RaisePropertyChanged(memberName);
-            return true;
-        }
-
-        private void RaisePropertyChanged([CallerMemberName] string prop = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
-        }
-
-        #endregion
-
 
     }
 }
